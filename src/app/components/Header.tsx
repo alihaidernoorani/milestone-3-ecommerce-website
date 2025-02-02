@@ -140,7 +140,7 @@ const Header = () => {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <nav className="z-20 absolute top-[74px] w-full bg-white shadow-lg p-4 md:hidden">
+        <nav className="z-20 absolute  w-full bg-white shadow-lg p-4 md:hidden">
           <ul className="flex flex-col gap-4">
             <li className="hover:text-[#029FAE] hover:font-bold transition-colors">
               <Link href="/">Home</Link>
