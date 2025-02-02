@@ -6,6 +6,7 @@ import { client } from "../../../sanity/lib/client";
 import { BsCartDash } from "react-icons/bs";
 import FeaturedProductsCard from "@/app/components/cards/FeaturedProductsCard";
 import { useCart } from "@/app/cart/context/CartContext";
+import toast from "react-hot-toast";
 
 interface ProductType {
   id: string;
@@ -21,7 +22,7 @@ interface ProductType {
 const ProductPage = ({ params }: { params: { id: number } }) => {
   const [products, setProducts] = useState<ProductType[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<ProductType[]>([]);
-  const [showAll, setShowAll] = useState(false); // State to toggle view
+  const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
 
   useEffect(() => {
@@ -57,28 +58,33 @@ const ProductPage = ({ params }: { params: { id: number } }) => {
         setFeaturedProducts(fetchedFeaturedProducts);
       } catch (error) {
         console.error("Error fetching products:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchProducts();
   }, []);
 
-  // Convert params.id to a number if it comes as a string
-  const productId = Number(params.id);
+  // Debugging logs (Check console output)
+  console.log("params.id:", params.id);
+  console.log("products:", products);
 
-  // Find the product with the matching slug
-  const product = products.find((p) => p.slug === productId);
+  if (loading) {
+    return <div className="text-center mt-20">Loading...</div>;
+  }
+
+ // Convert params.id to a number if it comes as a string
+ const productId = Number(params.id);
+
+ // Find the product with the matching slug
+ const product = products.find((p) => p.slug === productId);
 
   if (!product) {
     return <div className="text-center mt-20">Product not found</div>;
   }
 
   const { id, name, price, description, image } = product;
-
-  // Determine the products to display in the featured section
-  const displayedFeaturedProducts = showAll
-    ? featuredProducts
-    : featuredProducts.slice(0, 5);
 
   return (
     <div className="w-[80%] mx-auto mt-20">
@@ -101,7 +107,10 @@ const ProductPage = ({ params }: { params: { id: number } }) => {
           <p>{description}</p>
           <button
             className="bg-[#029FAE] text-white px-6 py-3 rounded-lg"
-            onClick={() => addToCart({ ...product, quantity: 1 })}
+            onClick={() => {
+              addToCart({ ...product, quantity: 1 });
+              toast(`${name} has been added to the cart!`);
+            }}
           >
             <BsCartDash className="inline mr-2 text-xl" />
             Add To Cart
@@ -109,33 +118,12 @@ const ProductPage = ({ params }: { params: { id: number } }) => {
         </div>
       </div>
       <div className="mt-20">
-        <div className="flex justify-between items-center">
-          <h1 className="md:text-xl lg:text-2xl xl:text-3xl font-bold mb-10 text-center md:text-start">
-            FEATURED PRODUCTS
-          </h1>
-          {/* Conditionally render the "View All" button */}
-          {featuredProducts.length > 5 && (
-            <button
-              className="text-[#029FAE]"
-              onClick={() => setShowAll(!showAll)}
-            >
-              {showAll ? "View Less" : "View All"}
-            </button>
-          )}
-        </div>
-
+        <h1 className="md:text-xl lg:text-2xl xl:text-3xl font-bold mb-10 text-center md:text-start">
+          FEATURED PRODUCTS
+        </h1>
         <div className="flex flex-col md:flex-row flex-wrap gap-4">
-          {displayedFeaturedProducts.map((product: ProductType) => (
-            <FeaturedProductsCard
-              key={product.id}
-              id={product.id}
-              image={product.image}
-              name={product.name}
-              price={product.price}
-              onSale={product.onSale}
-              isNew={product.isNew}
-              slug={product.slug}
-            />
+          {featuredProducts.map((product) => (
+            <FeaturedProductsCard key={product.id} {...product} />
           ))}
         </div>
       </div>
