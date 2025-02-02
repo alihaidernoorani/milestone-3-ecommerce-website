@@ -27,29 +27,26 @@ interface SummaryProps {
 const CartPage: React.FC = () => {
   const cartContext = useCart();
 
-  // Handle loading state
   if (!cartContext) {
     return <div>Loading...</div>;
   }
 
   const { cart, updateQuantity, removeFromCart } = cartContext;
 
-  // Calculate total price of all items in the cart
   const calculateTotal = (): number =>
     cart.reduce((total: number, item) => total + item.price * item.quantity, 0);
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
-      {/* Header */}
-      <h1 className="text-2xl font-bold my-6 text-myDarkOrange">Your Cart</h1>
+    <div className="p-4 md:p-8 max-w-7xl mx-auto">
+      <h1 className="text-2xl md:text-3xl font-bold my-4 md:my-6 text-myDarkOrange text-center md:text-left">
+        Your Cart
+      </h1>
 
-      {/* Empty Cart */}
       {cart.length === 0 ? (
         <p className="text-xl font-semibold text-center">Your Cart is Empty</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Cart Items */}
-          <div className="md:col-span-2 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+          <div className="lg:col-span-2 space-y-6">
             {cart.map((item) => (
               <CartItem
                 key={item.id}
@@ -60,8 +57,7 @@ const CartPage: React.FC = () => {
             ))}
           </div>
 
-          {/* Summary Section */}
-          <div className="border p-6 rounded-lg bg-gray-100 space-y-4">
+          <div className="border p-6 rounded-lg bg-gray-100 space-y-4 shadow-md">
             <h2 className="text-2xl font-bold text-gray-800">Summary</h2>
             <Summary calculateTotal={calculateTotal} />
             <button className="w-full py-3 text-white font-semibold rounded-full bg-[#029FAE] hover:bg-[#027f8a]">
@@ -74,12 +70,8 @@ const CartPage: React.FC = () => {
   );
 };
 
-const CartItem: React.FC<CartItemProps> = ({
-  item,
-  updateQuantity,
-  removeFromCart,
-}) => (
-  <div className="flex items-center border p-4 rounded-lg space-x-6">
+const CartItem: React.FC<CartItemProps> = ({ item, updateQuantity, removeFromCart }) => (
+  <div className="flex flex-col sm:flex-row items-center border p-4 rounded-lg space-y-4 sm:space-y-0 sm:space-x-6 shadow-sm">
     <Image
       src={urlFor(item.image).url()}
       alt={item.name}
@@ -87,10 +79,10 @@ const CartItem: React.FC<CartItemProps> = ({
       height={100}
       className="object-cover rounded-md"
     />
-    <div className="flex-1">
+    <div className="flex-1 text-center sm:text-left">
       <h2 className="font-semibold text-lg text-gray-800">{item.name}</h2>
       <p className="text-gray-600">Price: ${item.price.toFixed(2)}</p>
-      <p className="text-gray-600 flex items-center space-x-2">
+      <div className="text-gray-600 flex items-center justify-center sm:justify-start space-x-2 mt-2">
         <span>Quantity:</span>
         <button
           onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
@@ -105,9 +97,9 @@ const CartItem: React.FC<CartItemProps> = ({
         >
           +
         </button>
-      </p>
-      <div className="flex items-center space-x-4 mt-2">
-        <FaRegHeart />
+      </div>
+      <div className="flex items-center justify-center sm:justify-start space-x-4 mt-2">
+        <FaRegHeart className="cursor-pointer" />
         <button
           onClick={() => removeFromCart(item.id)}
           className="text-red-600 hover:text-red-800"
@@ -116,7 +108,7 @@ const CartItem: React.FC<CartItemProps> = ({
         </button>
       </div>
     </div>
-    <div>Total: ${(item.price * item.quantity).toFixed(2)}</div>
+    <div className="text-lg font-semibold">Total: ${(item.price * item.quantity).toFixed(2)}</div>
   </div>
 );
 
